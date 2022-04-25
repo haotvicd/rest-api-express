@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 const cors = require('cors')
 const todoModel = require('./model/Todo')
 const app = express()
-const port = 3000
+const port = 5000
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -14,9 +14,9 @@ app.use(cors());
 // CRUD = create, read, update, delete
 
 // get all todos
-app.get('/', async (req, res) => {
+app.get('/todo', async (req, res) => {
   try {
-    const todos = await todoModel.find();
+    const todos = await todoModel.find().sort({'createdAt': -1});
     res.json(todos);
   } catch (error) {
     console.log({ message: error });
@@ -24,7 +24,7 @@ app.get('/', async (req, res) => {
 });
 
 // get 1 todo
-app.get('/:id', async (req, res) => {
+app.get('/todo/:id', async (req, res) => {
   const id = req.params.id;
   try {
     const todo = await todoModel.findById(id);
@@ -35,10 +35,10 @@ app.get('/:id', async (req, res) => {
 });
 
 // add new todo
-app.post('/', async (req, res) => {
+app.post('/todo', async (req, res) => {
   const todo = new todoModel({
     title: req.body.title,
-    completed: req.body.completed
+    completed: false
   });
   try {
     const newTodo = await todo.save();
@@ -49,7 +49,7 @@ app.post('/', async (req, res) => {
 });
 
 // delete todo
-app.delete('/:id', async (req, res) => {
+app.delete('/todo/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await todoModel.deleteOne({ _id: id });
@@ -59,8 +59,8 @@ app.delete('/:id', async (req, res) => {
   }
 })
 
-// delete todo
-app.put('/:id', async (req, res) => {
+// update todo
+app.put('/todo/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await todoModel.updateOne({ _id: id }, { title: req.body.title });
